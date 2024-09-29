@@ -1,3 +1,7 @@
+using Bookstore.data;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+
 namespace Bookstore
 {
     public class Program
@@ -8,6 +12,19 @@ namespace Bookstore
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            // Configure JSON options to handle object cycles
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                });
+
+            // Get the connection string settings 
+            string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+            // Configure database context
+            builder.Services.AddDbContext<LibraryContext>(opt => opt.UseSqlServer(connectionString));
 
             var app = builder.Build();
 
